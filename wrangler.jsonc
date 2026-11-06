@@ -1,11 +1,21 @@
 {
+  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "quietpages",
-  "compatibility_date": "2026-10-08",
-  "build": {
-    "command": "npm run build",
-  },
-  "assets": {
-    "directory": "./dist",
-    "not_found_handling": "404-page",
-  },
+  "main": "./src/worker.ts",
+  "compatibility_date": "2026-11-06",
+  "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "emdash-quietpages-database",
+    },
+  ],
+  "r2_buckets": [
+    {
+      "binding": "MEDIA",
+      "bucket_name": "emdash-quietpages-media",
+    },
+  ],
+  "worker_loaders": [{ "binding": "LOADER" }],
+  "triggers": { "crons": ["* * * * *"] },
 }

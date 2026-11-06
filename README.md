@@ -9,7 +9,7 @@
 
 **Live preview:** https://quietpages.xocoweb.workers.dev/
 
-Quiet Pages is a free Astro theme for independent magazines, personal journals, and long-form writing. It pairs a calm, misty photographic hero and a serif reading column with the tools a publication needs, so the writing stays the focus. Posts are MDX files validated by Astro content collections, the settings live in a few config files, and the output is fully static.
+Quiet Pages is a free Astro theme for independent magazines, personal journals, and long-form writing. It pairs a calm, misty photographic hero and a serif reading column with the tools a publication needs, so the writing stays the focus. Posts can be authored as MDX files validated by Astro content collections or managed in EmDash Admin.
 
 ## Features
 
@@ -31,7 +31,7 @@ Quiet Pages is a free Astro theme for independent magazines, personal journals, 
 - Responsive, optimized images through Astro's image pipeline, with social cards cropped from each post's cover
 - RSS, sitemap, `robots.txt`, canonical URLs, Open Graph and Twitter/X cards, and JSON-LD for the site, posts, collections, profiles, and breadcrumbs
 - Self-hosted Newsreader, Geist, and Geist Mono, a local Lucide icon set, and design tokens in one stylesheet
-- Static output with no framework islands and only a few small scripts
+- Server-rendered article pages for MDX and EmDash-managed posts, with only a few small scripts
 - Landmarks, labelled controls, visible focus states, and keyboard support throughout
 
 ## Tech Stack
@@ -76,7 +76,9 @@ npm run release:check
 
 See [CUSTOMIZATION.md](./CUSTOMIZATION.md) for site settings, authors, sections and tags, posts and their frontmatter, the homepage and its hero image, search and the archive, article pages, forms, the theme's design tokens, fonts, icons, and dark mode.
 
-Set `siteConfig.siteUrl` in [src/config/site.ts](./src/config/site.ts) before building — canonical URLs, social images, the sitemap, the RSS feed, `robots.txt`, and the structured data are all derived from it. The build is static, so any host that serves a directory works: `vercel.json` is included for Vercel and `wrangler.jsonc` for Cloudflare Workers, and Netlify, GitHub Pages, and object storage behind a CDN need no configuration beyond `npm run build`.
+Set `siteConfig.siteUrl` in [src/config/site.ts](./src/config/site.ts) before building — canonical URLs, social images, the sitemap, the RSS feed, `robots.txt`, and the structured data are all derived from it. The EmDash integration is configured for Cloudflare Workers with D1 (`DB`) and R2 (`MEDIA`); `wrangler.jsonc` also configures the Worker Loader and scheduled publishing. Build and deploy with `npm run build` followed by `npx wrangler deploy`. This Cloudflare configuration does not use `vercel.json`.
+
+The EmDash Admin's **Live View** opens posts through `/blog/<id>`, matching the site's article route.
 
 ## Content
 

@@ -1,0 +1,12 @@
+overrides:
+  yaml: ^2.8.3
+  zod: ^4.6.7
+
+minimumReleaseAgeExclude:
+  - '@astrojs/cloudflare@14.4.6'
+  - '@astrojs/internal-helpers@0.13.1'
+  - '@cloudflare/workers-types@5.20261106.1'
+
+allowBuilds:
+  esbuild: set this to true or false
+  workerd: set this to true or false

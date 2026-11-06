@@ -1,0 +1,14 @@
+---
+import { getEmDashCollection } from "emdash";
+
+const { entries: posts, error } = await getEmDashCollection("posts");
+
+if (error) {
+  throw error;
+}
+---
+
+<h1>EmDash posts</h1>
+<ul>
+  {posts.map((post) => <li>{post.data.title}</li>)}
+</ul>

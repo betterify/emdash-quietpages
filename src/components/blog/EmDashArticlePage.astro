@@ -1,0 +1,72 @@
+---
+import type { ContentEntry, EmDashCollections } from "emdash";
+import { Image as EmDashImage, PortableText } from "emdash/ui";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { siteConfig } from "@/config/site";
+
+interface Props {
+  post: ContentEntry<EmDashCollections["posts"]>;
+}
+
+const { post } = Astro.props;
+const date = post.data.publishedAt ?? post.data.updatedAt ?? post.data.createdAt;
+const image = post.data.featured_image;
+---
+
+<BaseLayout
+  title={post.data.title}
+  description={post.data.excerpt ?? ""}
+  image={image?.src}
+  imageAlt={image?.alt}
+  type="article"
+  publishedTime={date}
+  modifiedTime={post.data.updatedAt}
+>
+  <article>
+    <header class="shell py-12 text-center sm:py-16">
+      <a href="/blog/" class="text-sm text-muted hover:text-ink">
+        Writing
+      </a>
+      <h1 class="serif mx-auto mt-8 max-w-4xl text-headline font-normal">{post.data.title}</h1>
+      {post.data.excerpt && (
+        <p class="mx-auto mt-6 max-w-2xl text-lead text-body">{post.data.excerpt}</p>
+      )}
+      <div class="mt-8 flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm text-muted">
+        {post.data.bylines?.map(({ byline, roleLabel }) => (
+          <span>
+            {byline.displayName}
+            {roleLabel && `, ${roleLabel}`}
+          </span>
+        ))}
+        {date && (
+          <time datetime={date.toISOString()}>
+            {date.toLocaleDateString(siteConfig.dateLocale, {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </time>
+        )}
+      </div>
+    </header>
+
+    {image && (
+      <figure class="shell max-w-[calc(66rem+2*var(--gutter))]">
+        <div class="media shadow-[var(--shadow-card)]">
+          <EmDashImage
+            image={image}
+            class="aspect-[16/9] w-full"
+            alt={image.alt ?? post.data.title}
+            priority
+          />
+        </div>
+      </figure>
+    )}
+
+    <div class="shell mx-auto mt-14 max-w-[42rem] sm:mt-20">
+      <div class="prose-article">
+        <PortableText value={post.data.content ?? []} />
+      </div>
+    </div>
+  </article>
+</BaseLayout>

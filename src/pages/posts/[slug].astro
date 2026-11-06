@@ -1,0 +1,21 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+
+export const prerender = false;
+
+const slug = Astro.params.slug;
+if (!slug) {
+  Astro.response.status = 404;
+} else {
+  return Astro.redirect(`/blog/${encodeURIComponent(slug)}${Astro.url.search}`, 307);
+}
+---
+
+<BaseLayout title="Article not found" noindex>
+  <main class="shell py-24 text-center">
+    <h1 class="serif text-headline font-normal">Article not found</h1>
+    <a href="/blog/" class="btn btn-primary mt-8">
+      Browse all writing
+    </a>
+  </main>
+</BaseLayout>
