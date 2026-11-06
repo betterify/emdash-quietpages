@@ -1,27 +1,63 @@
 ---
 import PostCard from "@/components/blog/PostCard.astro";
+import EmDashPostCard from "@/components/blog/EmDashPostCard.astro";
 import Icon from "@/components/ui/Icon.astro";
 import PageHeader from "@/components/ui/PageHeader.astro";
 import { categories, tags } from "@/config/taxonomy";
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import { categoryUrl, getPosts, plural, tagUrl } from "@/lib/posts";
+import {
+  categoryUrl,
+  getEmDashPostDate,
+  getEmDashPosts,
+  getPosts,
+  plural,
+  tagUrl,
+} from "@/lib/posts";
 import { withBreadcrumbs } from "@/lib/schema";
 
 const posts = await getPosts();
+const emDashPosts = await getEmDashPosts();
+const items = [
+  ...posts.map((post) => ({ kind: "local" as const, post, date: post.date })),
+  ...emDashPosts.map((post) => ({ kind: "emdash" as const, post, date: getEmDashPostDate(post) })),
+].sort((a, b) => b.date.valueOf() - a.date.valueOf());
+const categoryCounts = new Map(
+  categories.map((category) => [
+    category.slug,
+    {
+      name: category.name,
+      count: posts.filter((post) => post.category === category.slug).length,
+    },
+  ]),
+);
+const tagCounts = new Map(
+  tags.map((tag) => [
+    tag.slug,
+    {
+      name: tag.name,
+      count: posts.filter((post) => post.tags.includes(tag.slug)).length,
+    },
+  ]),
+);
 
-/* Options with no post behind them are dropped, so no filter is a dead end. */
-const categoryOptions = categories
-  .map((category) => ({
-    ...category,
-    count: posts.filter((post) => post.category === category.slug).length,
-  }))
+for (const post of emDashPosts) {
+  for (const term of post.data.terms?.category ?? []) {
+    const option = categoryCounts.get(term.slug) ?? { name: term.label, count: 0 };
+    option.count += 1;
+    categoryCounts.set(term.slug, option);
+  }
+  for (const term of post.data.terms?.tag ?? []) {
+    const option = tagCounts.get(term.slug) ?? { name: term.label, count: 0 };
+    option.count += 1;
+    tagCounts.set(term.slug, option);
+  }
+}
+
+const categoryOptions = [...categoryCounts.entries()]
+  .map(([slug, option]) => ({ slug, ...option }))
   .filter((category) => category.count > 0);
-
-const tagOptions = tags
-  .map((tag) => ({
-    ...tag,
-    count: posts.filter((post) => (post.tags as string[]).includes(tag.slug)).length,
-  }))
+const tagOptions = [...tagCounts.entries()]
+  .map(([slug, option]) => ({ slug, ...option }))
   .filter((tag) => tag.count > 0);
 
 const crumbs = [{ label: "Home", href: "/" }, { label: "Writing" }];
@@ -34,7 +70,7 @@ const crumbs = [{ label: "Home", href: "/" }, { label: "Writing" }];
 >
   <PageHeader
     title="The archive"
-    lead={`Every essay, field note, and interview we've published, newest first. ${plural(posts.length, "piece")} so far.`}
+    lead={`Every essay, field note, and interview we've published, newest first. ${plural(items.length, "piece")} so far.`}
     crumbs={crumbs}
   />
 
@@ -82,12 +118,16 @@ const crumbs = [{ label: "Home", href: "/" }, { label: "Writing" }];
             <a href="/blog/" class="facet" data-filter="cat" data-value="" aria-current="true">
               <span class="facet-label">All sections</span>
               <span class="facet-count" data-facet-count>
-                {posts.length}
+                {items.length}
               </span>
             </a>
             {categoryOptions.map((category) => (
               <a
-                href={categoryUrl(category.slug)}
+                href={
+                  categories.some((item) => item.slug === category.slug)
+                    ? categoryUrl(category.slug)
+                    : `/blog/?cat=${encodeURIComponent(category.slug)}`
+                }
                 class="facet"
                 data-filter="cat"
                 data-value={category.slug}
@@ -116,11 +156,20 @@ const crumbs = [{ label: "Home", href: "/" }, { label: "Writing" }];
             <a href="/blog/" class="facet" data-filter="tag" data-value="" aria-current="true">
               <span class="facet-label">Any tag</span>
               <span class="facet-count" data-facet-count>
-                {posts.length}
+                {items.length}
               </span>
             </a>
             {tagOptions.map((tag) => (
-              <a href={tagUrl(tag.slug)} class="facet" data-filter="tag" data-value={tag.slug}>
+              <a
+                href={
+                  tags.some((item) => item.slug === tag.slug)
+                    ? tagUrl(tag.slug)
+                    : `/blog/?tag=${encodeURIComponent(tag.slug)}`
+                }
+                class="facet"
+                data-filter="tag"
+                data-value={tag.slug}
+              >
                 <span class="facet-label">{tag.name}</span>
                 <span class="facet-count" data-facet-count>
                   {tag.count}
@@ -134,14 +183,20 @@ const crumbs = [{ label: "Home", href: "/" }, { label: "Writing" }];
           Clear filters
         </button>
         <p class="ml-auto text-sm text-muted tabular-nums" data-archive-count aria-live="polite">
-          {plural(posts.length, "result")}
+          {plural(items.length, "result")}
         </p>
       </div>
     </div>
 
     <div class="mt-12 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3" data-archive-list>
-      {posts.map((post) => (
-        <PostCard post={post} headingLevel={2} />
+      {items.map((item) => (
+        <>
+          {item.kind === "local" ? (
+            <PostCard post={item.post} headingLevel={2} />
+          ) : (
+            <EmDashPostCard post={item.post} headingLevel={2} />
+          )}
+        </>
       ))}
     </div>
 

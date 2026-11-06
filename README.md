@@ -31,6 +31,7 @@ Quiet Pages is a free Astro theme for independent magazines, personal journals, 
 - Responsive, optimized images through Astro's image pipeline, with social cards cropped from each post's cover
 - RSS, sitemap, `robots.txt`, canonical URLs, Open Graph and Twitter/X cards, and JSON-LD for the site, posts, collections, profiles, and breadcrumbs
 - Self-hosted Newsreader, Geist, and Geist Mono, a local Lucide icon set, and design tokens in one stylesheet
+- EmDash-managed published posts in the homepage's latest writing and the Writing archive, alongside MDX articles
 - Server-rendered article pages for MDX and EmDash-managed posts, with only a few small scripts
 - Landmarks, labelled controls, visible focus states, and keyboard support throughout
 

@@ -1,0 +1,64 @@
+---
+import { Image } from "emdash/ui";
+import { siteConfig } from "@/config/site";
+import type { EmDashPost } from "@/lib/posts";
+
+interface Props {
+  post: EmDashPost;
+  headingLevel?: 2 | 3;
+  hidden?: boolean;
+}
+
+const { post, headingLevel = 3, hidden = false } = Astro.props;
+const Heading = `h${headingLevel}` as "h2" | "h3";
+const date = post.data.publishedAt ?? post.data.createdAt;
+const categories = post.data.terms?.category ?? [];
+const tags = post.data.terms?.tag ?? [];
+const category = categories[0];
+const image = post.data.featured_image;
+const searchable = [
+  post.data.title,
+  post.data.excerpt,
+  ...categories.map((term) => term.label),
+  ...tags.map((term) => term.label),
+  ...(post.data.bylines ?? []).map(({ byline }) => byline.displayName),
+]
+  .filter(Boolean)
+  .join(" ")
+  .toLowerCase();
+const href = `/blog/${encodeURIComponent(post.data.slug ?? post.id)}/`;
+---
+
+<article
+  class="group relative flex flex-col"
+  data-post-card
+  data-category={categories.map((term) => term.slug).join(" ")}
+  data-tags={tags.map((term) => term.slug).join(" ")}
+  data-search={searchable}
+  hidden={hidden}
+>
+  <div class="media aspect-[3/2]">
+    {image && <Image image={image} alt={image.alt ?? ""} class="size-full object-cover" />}
+  </div>
+  <div class="meta mt-5">
+    {category && <span>{category.label}</span>}
+    <time datetime={date.toISOString()}>
+      {date.toLocaleDateString(siteConfig.dateLocale, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })}
+    </time>
+  </div>
+  <Heading class="serif mt-2.5 text-title font-medium">
+    <a href={href} class="card-title after:absolute after:inset-0 after:content-['']">
+      {post.data.title}
+    </a>
+  </Heading>
+  {post.data.excerpt && (
+    <p class="mt-3 line-clamp-2 text-[0.9375rem] leading-relaxed text-muted">{post.data.excerpt}</p>
+  )}
+  {post.data.bylines?.[0] && (
+    <div class="mt-5 text-sm text-muted">{post.data.bylines[0].byline.displayName}</div>
+  )}
+</article>

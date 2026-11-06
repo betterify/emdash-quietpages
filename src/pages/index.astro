@@ -5,9 +5,10 @@ import LeadStory from "@/components/home/LeadStory.astro";
 import SectionTiles from "@/components/home/SectionTiles.astro";
 import { homeConfig } from "@/config/home";
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import { getLeadPost, getPosts } from "@/lib/posts";
+import { getEmDashPosts, getLeadPost, getPosts } from "@/lib/posts";
 
 const posts = await getPosts();
+const emDashPosts = await getEmDashPosts();
 const lead = await getLeadPost();
 const rest = posts.filter((post) => post.slug !== lead.slug);
 ---
@@ -15,6 +16,6 @@ const rest = posts.filter((post) => post.slug !== lead.slug);
 <BaseLayout>
   <Hero lead={lead} />
   <LeadStory post={lead} />
-  <LatestPosts posts={rest} />
+  <LatestPosts posts={rest} emDashPosts={emDashPosts} />
   <SectionTiles posts={posts} title={homeConfig.sections.title} lead={homeConfig.sections.lead} />
 </BaseLayout>

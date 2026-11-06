@@ -1,7 +1,10 @@
 import { getCollection, type CollectionEntry } from "astro:content";
+import { getEmDashCollection, type ContentEntry, type EmDashCollections } from "emdash";
 import { authors } from "@/config/authors";
 import { siteConfig } from "@/config/site";
 import { categories, tags } from "@/config/taxonomy";
+
+export type EmDashPost = ContentEntry<EmDashCollections["posts"]>;
 
 export type Post = CollectionEntry<"blog">["data"] & {
   slug: string;
@@ -36,6 +39,17 @@ export const getPosts = async (): Promise<Post[]> => {
   }
   return cache;
 };
+
+export const getEmDashPosts = async (): Promise<EmDashPost[]> => {
+  const { entries, error } = await getEmDashCollection("posts", {
+    status: "published",
+    orderBy: { published_at: "desc" },
+  });
+  if (error) throw error;
+  return entries;
+};
+
+export const getEmDashPostDate = (post: EmDashPost) => post.data.publishedAt ?? post.data.createdAt;
 
 export const getAuthor = (slug: string) => authors.find((author) => author.slug === slug);
 export const getCategory = (slug: string) => categories.find((item) => item.slug === slug);
