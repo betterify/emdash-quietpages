@@ -1,21 +1,32 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "quietpages",
-  "main": "./src/worker.ts",
-  "compatibility_date": "2026-11-06",
-  "compatibility_flags": ["nodejs_compat"],
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "emdash-quietpages-database",
-    },
-  ],
-  "r2_buckets": [
-    {
-      "binding": "MEDIA",
-      "bucket_name": "emdash-quietpages-media",
-    },
-  ],
-  "worker_loaders": [{ "binding": "LOADER" }],
-  "triggers": { "crons": ["* * * * *"] },
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "quietpages",
+	"main": "./src/worker.ts",
+	"compatibility_date": "2026-11-06",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "emdash-quietpages-database",
+			"database_id": "16c30601-cb8d-4ece-a622-5556032086f7",
+		},
+	],
+	"r2_buckets": [
+		{
+			"binding": "MEDIA",
+			"bucket_name": "emdash-quietpages-media",
+		},
+	],
+	"worker_loaders": [
+		{
+			"binding": "LOADER"
+		}
+	],
+	"triggers": {
+		"crons": [
+			"* * * * *"
+		]
+	},
 }
